@@ -24,6 +24,9 @@ func main() {
 	choices := []uint {0, 1, 2, 3, 4, 5, 6, 7, 8}
 
 	userMarker, computerMarker := assignMarkers()
+
+  printInstructions()
+
 }
 
 func assignMarkers() (string, string) {
@@ -55,4 +58,10 @@ func assignMarkers() (string, string) {
   fmt.Printf("The computer's marker is: %s\n", computerMarker)
 
 	return userMarker, computerMarker
+}
+
+func printInstructions() {
+  fmt.Println("Initializing game board.....")
+  fmt.Println("*****************************")
+  fmt.Println("You can mark a location by entering any of the numbers shown on the board.")
 }
