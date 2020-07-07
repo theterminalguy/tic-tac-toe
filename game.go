@@ -1,18 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 func main() {
-	InvertMarker := map[string]string {
-		"X": "O",
-		"O": "X",
-	}
-	Board := [][]string {
+	board := [][]string {
 		{"0", "1", "2"},
 		{"3", "4", "5"},
 		{"6", "7", "8"},
 	}
-	Wins := [][]uint {
+	wins := [][]uint {
 		{0, 1, 2},
 		{3, 4, 5},
 		{6, 7, 8},
@@ -22,7 +21,38 @@ func main() {
 		{0, 4, 8},
 		{2, 4, 6},
 	}
-	Choices := []uint {0, 1, 2, 3, 4, 5, 6, 7, 8}
+	choices := []uint {0, 1, 2, 3, 4, 5, 6, 7, 8}
 
-	
+	userMarker, computerMarker := assignMarkers()
+}
+
+func assignMarkers() (string, string) {
+	marker := map[string]string {
+		"X": "O",
+		"O": "X",
+	}
+
+	var (
+		userMarker
+		computerMarker
+	)
+
+	fmt.Println("Please choose a marker.", "X or O ?")
+	for true {
+		fmt.Scanf("%s", &userMarker)
+		userMarker = strings.Title(userMarker)
+
+		if marker, ok := marker[userMarker]; ok {
+			computerMarker = marker
+
+			break
+		} else {
+			fmt.Println("Invalid marker. Please choose either X or O!")
+		}
+	}
+
+	fmt.Printf("Your marker is: %s\n", userMarker)
+  fmt.Printf("The computer's marker is: %s\n", computerMarker)
+
+	return userMarker, computerMarker
 }
