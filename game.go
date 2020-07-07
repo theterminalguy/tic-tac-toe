@@ -11,16 +11,6 @@ func main() {
 		{"3", "4", "5"},
 		{"6", "7", "8"},
 	}
-	wins := [][]uint {
-		{0, 1, 2},
-		{3, 4, 5},
-		{6, 7, 8},
-		{0, 3, 6},
-		{1, 4, 7},
-		{2, 5, 8},
-		{0, 4, 8},
-		{2, 4, 6},
-	}
 	choices := []uint {0, 1, 2, 3, 4, 5, 6, 7, 8}
 
 	var (
@@ -49,7 +39,41 @@ func main() {
 		fmt.Printf("Your turn(%s), pick a spot\n", userMarker)
 		userChoice = awaitUserChoice()
 
+		userMarkedSpots = append(userMarkedSpots, userChoice)
+		updateBoard(board, userChoice, userMarker)
+		drawBoard(board)
+
+		if hasWon(userMarkedSpots) {
+			fmt.Printf ("User(%s) won!\n", userMarker)
+		}
+
 	}
+}
+
+func hasWon(markedSpots uint) bool {
+	const (
+		SPOTS_REQUIRED_TO_WIN = 3
+	)
+	wins := [][]uint {
+		{0, 1, 2},
+		{3, 4, 5},
+		{6, 7, 8},
+		{0, 3, 6},
+		{1, 4, 7},
+		{2, 5, 8},
+		{0, 4, 8},
+		{2, 4, 6},
+	}
+
+	if len(markedSpots) >= SPOTS_REQUIRED_TO_WIN {
+		for _, win := wins{
+			if subset(win, markedSpots) {
+				return true 
+			}
+		}
+	}
+
+	return false
 }
 
 func gameOver(markedSpots []uint) bool {
@@ -95,9 +119,9 @@ func assignMarkers() (string, string) {
 			computerMarker = marker
 
 			break
-		} else {
-			fmt.Println("Invalid marker. Please choose either X or O!")
-		}
+		} 
+		
+		fmt.Println("Invalid marker. Please choose either X or O!")
 	}
 
 	fmt.Printf("Your marker is: %s\n", userMarker)
