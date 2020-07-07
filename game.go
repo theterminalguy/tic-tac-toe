@@ -8,6 +8,9 @@ import (
 )
 
 func main() {
+	// colorRed := "\033[31m"
+	// colorGreen := "\033[32m"
+
 	board := [][]string {
 		{"0", "1", "2"},
 		{"3", "4", "5"},
@@ -16,17 +19,17 @@ func main() {
 	choices := []uint {0, 1, 2, 3, 4, 5, 6, 7, 8}
 
 	var (
-		userMarkedSpots = uint[]
-		computerMarkedSpots = uint[]
-    markedSpots = uint[]
-    unMarkedSpots = uint[]
+		userMarkedSpots []uint
+		computerMarkedSpots []uint
+		markedSpots []uint
+		unMarkedSpots []uint
 	)
 
 	userMarker, computerMarker := assignMarkers()
 
-  printInstructions()
+	printInstructions()
 
-	drawBoard()
+	drawBoard(board)
 
 	// start game
 
@@ -38,7 +41,7 @@ func main() {
 		}
 
 		fmt.Printf("Your turn(%s), pick a spot\n", userMarker)
-		userChoice = awaitUserChoice()
+		userChoice := awaitUserChoice(unMarkedSpots)
 
 		updateBoard(board, userChoice, userMarker)
 		drawBoard(board)
@@ -55,15 +58,15 @@ func main() {
 
 
 		fmt.Println("Computer is thinking...")
-    computerChoice = awaitComputerChoice()
+    computerChoice := awaitComputerChoice(unMarkedSpots)
 
-    updateBoard(board, computerChoice, computerMarker)
-    drawBoard(board)
+		updateBoard(board, computerChoice, computerMarker)
+		drawBoard(board)
 
-    computerMarkedSpots = append(computerMarkedSpots, computerChoice)
-    if hasWon(computerMarkedSpots) {
-      fmt.Printf("Computer(%s) won!\n", computerMarker)
-    }
+		computerMarkedSpots = append(computerMarkedSpots, computerChoice)
+		if hasWon(computerMarkedSpots) {
+			fmt.Printf("Computer(%s) won!\n", computerMarker)
+		}
 
 		markedSpots = append(userMarkedSpots, computerMarkedSpots...)
 		unMarkedSpots = diff(choices, markedSpots)
@@ -71,7 +74,7 @@ func main() {
 	}
 }
 
-func hasWon(markedSpots uint) bool {
+func hasWon(markedSpots []uint) bool {
 	const (
 		SPOTS_REQUIRED_TO_WIN = 3
 	)
@@ -87,8 +90,8 @@ func hasWon(markedSpots uint) bool {
 	}
 
 	if len(markedSpots) >= SPOTS_REQUIRED_TO_WIN {
-		for _, win := wins{
-			if subset(win, markedSpots) {
+		for _, win := range wins {
+			if isSubset(win, markedSpots) {
 				return true
 			}
 		}
@@ -105,7 +108,7 @@ func gameOver(markedSpots []uint) bool {
 	return len(markedSpots) == AVAILABLE_SPOTS
 }
 
-func awaitUserChoice() string {
+func awaitUserChoice(unMarkedSpots []uint) uint {
 	var choice uint
 	for true {
 		fmt.Scanf("%d", &choice)
@@ -120,60 +123,119 @@ func awaitUserChoice() string {
 	return choice
 }
 
-func awaitComputerChoice(unmarkedSpots []uint) string {
-  time.sleep(2000 * time.Millisecond) // sleep for 2 seconds
-  rand.Seed(time.Now().Unix())
-  randomPosition := rand.Intn(len(unmarkedSpots))
+func awaitComputerChoice(unmarkedSpots []uint) uint {
+	time.Sleep(2000 * time.Millisecond) // sleep for 2 seconds
+	rand.Seed(time.Now().Unix())
+	randomPosition := rand.Intn(len(unmarkedSpots))
 
-  return unMarkedSpots[randomPosition]
+	return unmarkedSpots[randomPosition]
 }
 
 func assignMarkers() (string, string) {
-  marker := map[string]string {
-    "X": "O",
-    "O": "X",
-  }
+	marker := map[string]string {
+		"X": "O",
+		"O": "X",
+	}
 
-  var (
-    userMarker
-    computerMarker
-  )	
+	var (
+		userMarker string
+		computerMarker string
+	)
 
-  fmt.Println("Please choose a marker.", "X or O ?")
-  for true {
-    fmt.Scanf("%s", &userMarker)
-    userMarker = strings.Title(userMarker)
+	fmt.Println("Please choose a marker.", "X or O ?")
+	for true {
+		fmt.Scanf("%s", &userMarker)
+		userMarker = strings.Title(userMarker)
 
-    if marker, ok := marker[userMarker]; ok {
-      computerMarker = marker
+		if marker, ok := marker[userMarker]; ok {
+			computerMarker = marker
 
-      break
-    }
+			break
+		}
 
-    fmt.Println("Invalid marker. Please choose either X or O!")
-  }
+		fmt.Println("Invalid marker. Please choose either X or O!")
+	}
 
-  fmt.Printf("Your marker is: %s\n", userMarker)
-  fmt.Printf("The computer's marker is: %s\n", computerMarker)
+	fmt.Printf("Your marker is: %s\n", userMarker)
+	fmt.Printf("The computer's marker is: %s\n", computerMarker)
 
-  return userMarker, computerMarker
+	return userMarker, computerMarker
 }
 
 func printInstructions() {
-  fmt.Println("Initializing game board.....")
-  fmt.Println("*****************************")
-  fmt.Println("You can mark a location by entering any of the numbers shown on the board.")
+	fmt.Println("Initializing game board.....")
+	fmt.Println("*****************************")
+	fmt.Println("You can mark a location by entering any of the numbers shown on the board.")
 }
 
 // should be in the board package
 func drawBoard(board [][]string) {
-  displayBoard := ""
+	displayBoard := ""
 
-  for _, row := range board {
-    displayBoard += " "
-    displayBoard += strings.Join(row, " | ")
-    displayBoard += "\n-----------\n"
+	for _, row := range board {
+		displayBoard += " "
+		displayBoard += strings.Join(row, " | ")
+		displayBoard += "\n-----------\n"
+	}
+
+	fmt.Println(displayBoard)
+}
+
+func updateBoard(board [][]string, pos uint, marker string) {
+  r := row(pos)
+  c := column(pos)
+
+  board[r][c] = marker
+}
+
+func diff(superSet []uint, subset []uint) []uint {
+  var res []uint
+
+  for _, choice := range superSet {
+    if !Contains(subset, choice) {
+      res = append(res, choice)
+    }
   }
 
-  fmt.Println(displayBoard)
+  return res
 }
+
+func isSubset(subset []uint, superSet []uint) bool {
+  // TOOD: Use contains
+
+  foundCount := 0
+
+  for _, s1 := range subset {
+    for _, s2 := range superSet {
+      if s1 == s2 {
+        foundCount += 1
+
+        continue
+      }
+    }
+  }
+
+  return foundCount >= len(subset)
+}
+
+
+func Contains(set []uint, element uint) bool {
+  // TODO rename to memeber
+
+  for _, n := range set {
+    if element == n {
+      return true
+    }
+  }
+
+  return false
+}
+
+func row(pos uint) uint {
+  return pos / 3
+}
+
+func column(pos uint) uint {
+  return pos % 3
+}
+
