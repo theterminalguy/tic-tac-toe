@@ -27,6 +27,9 @@ func main() {
 
   printInstructions()
 
+	drawBoard() 
+
+
 }
 
 func assignMarkers() (string, string) {
@@ -64,4 +67,17 @@ func printInstructions() {
   fmt.Println("Initializing game board.....")
   fmt.Println("*****************************")
   fmt.Println("You can mark a location by entering any of the numbers shown on the board.")
+}
+
+// should be in the board package
+func drawBoard(board [][]string) {
+  displayBoard := ""
+
+  for _, row := range board {
+    displayBoard += " "
+    displayBoard += strings.Join(row, " | ")
+    displayBoard += "\n-----------\n"
+  }
+
+  fmt.Println(displayBoard)
 }
