@@ -8,6 +8,8 @@ import (
 )
 
 func main() {
+  // Information => Green
+  // Instruction => 
 	// colorRed := "\033[31m"
 	// colorGreen := "\033[32m"
 
@@ -22,7 +24,7 @@ func main() {
 		userMarkedSpots []uint
 		computerMarkedSpots []uint
 		markedSpots []uint
-		unMarkedSpots []uint
+		unMarkedSpots = []uint {0, 1, 2, 3, 4, 5, 6, 7, 8}
 	)
 
 	userMarker, computerMarker := assignMarkers()
@@ -49,6 +51,8 @@ func main() {
 		userMarkedSpots = append(userMarkedSpots, userChoice)
 		if hasWon(userMarkedSpots) {
 			fmt.Printf ("User(%s) won!\n", userMarker)
+
+      break
 		}
 
 		// computer turn
@@ -66,6 +70,8 @@ func main() {
 		computerMarkedSpots = append(computerMarkedSpots, computerChoice)
 		if hasWon(computerMarkedSpots) {
 			fmt.Printf("Computer(%s) won!\n", computerMarker)
+
+      break
 		}
 
 		markedSpots = append(userMarkedSpots, computerMarkedSpots...)
@@ -163,8 +169,11 @@ func assignMarkers() (string, string) {
 }
 
 func printInstructions() {
+  fmt.Println("\n")
+	fmt.Println("*****************************")
 	fmt.Println("Initializing game board.....")
 	fmt.Println("*****************************")
+  fmt.Println("\n")
 	fmt.Println("You can mark a location by entering any of the numbers shown on the board.")
 }
 
