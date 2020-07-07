@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+  "math/rand"
 	"strings"
+  "time"
 )
 
 func main() {
@@ -16,20 +18,19 @@ func main() {
 	var (
 		userMarkedSpots = uint[]
 		computerMarkedSpots = uint[]
+    markedSpots = uint[]
+    unMarkedSpots = uint[]
 	)
 
 	userMarker, computerMarker := assignMarkers()
 
   printInstructions()
 
-	drawBoard() 
+	drawBoard()
 
 	// start game
 
 	for true {
-		markedSpots = append(userMarkedSpots, computerMarkedSpots...)
-		unMarkedSpots = diff(choices, markedSpots)
-
 		if gameOver(markedSpots) {
 			fmt.Println("Game Over, it's a tie")
 
@@ -39,13 +40,33 @@ func main() {
 		fmt.Printf("Your turn(%s), pick a spot\n", userMarker)
 		userChoice = awaitUserChoice()
 
-		userMarkedSpots = append(userMarkedSpots, userChoice)
 		updateBoard(board, userChoice, userMarker)
 		drawBoard(board)
 
+		userMarkedSpots = append(userMarkedSpots, userChoice)
 		if hasWon(userMarkedSpots) {
 			fmt.Printf ("User(%s) won!\n", userMarker)
 		}
+
+		// computer turn
+
+		markedSpots = append(userMarkedSpots, computerMarkedSpots...)
+		unMarkedSpots = diff(choices, markedSpots)
+
+
+		fmt.Println("Computer is thinking...")
+    computerChoice = awaitComputerChoice()
+
+    updateBoard(board, computerChoice, computerMarker)
+    drawBoard(board)
+
+    computerMarkedSpots = append(computerMarkedSpots, computerChoice)
+    if hasWon(computerMarkedSpots) {
+      fmt.Printf("Computer(%s) won!\n", computerMarker)
+    }
+
+		markedSpots = append(userMarkedSpots, computerMarkedSpots...)
+		unMarkedSpots = diff(choices, markedSpots)
 
 	}
 }
@@ -68,7 +89,7 @@ func hasWon(markedSpots uint) bool {
 	if len(markedSpots) >= SPOTS_REQUIRED_TO_WIN {
 		for _, win := wins{
 			if subset(win, markedSpots) {
-				return true 
+				return true
 			}
 		}
 	}
@@ -88,10 +109,10 @@ func awaitUserChoice() string {
 	var choice uint
 	for true {
 		fmt.Scanf("%d", &choice)
-		
+
 		if(Contains(unMarkedSpots, choice)) {
 			break
-		} 
+		}
 
 		fmt.Println("Invalid choice. Please pick an available spot.")
 	}
@@ -99,35 +120,43 @@ func awaitUserChoice() string {
 	return choice
 }
 
+func awaitComputerChoice(unmarkedSpots []uint) string {
+  time.sleep(2000 * time.Millisecond) // sleep for 2 seconds
+  rand.Seed(time.Now().Unix())
+  randomPosition := rand.Intn(len(unmarkedSpots))
+
+  return unMarkedSpots[randomPosition]
+}
+
 func assignMarkers() (string, string) {
-	marker := map[string]string {
-		"X": "O",
-		"O": "X",
-	}
+  marker := map[string]string {
+    "X": "O",
+    "O": "X",
+  }
 
-	var (
-		userMarker
-		computerMarker
-	)
+  var (
+    userMarker
+    computerMarker
+  )	
 
-	fmt.Println("Please choose a marker.", "X or O ?")
-	for true {
-		fmt.Scanf("%s", &userMarker)
-		userMarker = strings.Title(userMarker)
+  fmt.Println("Please choose a marker.", "X or O ?")
+  for true {
+    fmt.Scanf("%s", &userMarker)
+    userMarker = strings.Title(userMarker)
 
-		if marker, ok := marker[userMarker]; ok {
-			computerMarker = marker
+    if marker, ok := marker[userMarker]; ok {
+      computerMarker = marker
 
-			break
-		} 
-		
-		fmt.Println("Invalid marker. Please choose either X or O!")
-	}
+      break
+    }
 
-	fmt.Printf("Your marker is: %s\n", userMarker)
+    fmt.Println("Invalid marker. Please choose either X or O!")
+  }
+
+  fmt.Printf("Your marker is: %s\n", userMarker)
   fmt.Printf("The computer's marker is: %s\n", computerMarker)
 
-	return userMarker, computerMarker
+  return userMarker, computerMarker
 }
 
 func printInstructions() {
