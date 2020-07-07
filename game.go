@@ -23,13 +23,36 @@ func main() {
 	}
 	choices := []uint {0, 1, 2, 3, 4, 5, 6, 7, 8}
 
+	var (
+		userMarkedSpots = uint[]
+		computerMarkedSpots = uint[]
+	)
+
 	userMarker, computerMarker := assignMarkers()
 
   printInstructions()
 
 	drawBoard() 
 
+	// start game
 
+	for true {
+		markedSpots = append(userMarkedSpots, computerMarkedSpots...)
+
+		if gameOver(markedSpots) {
+			fmt.Println("Game Over, it's a tie")
+
+			break
+		}
+	}
+}
+
+func gameOver(markedSpots []uint) bool {
+	const (
+		AVAILABLE_SPOTS = 9
+	)
+
+	return len(markedSpots) == AVAILABLE_SPOTS
 }
 
 func assignMarkers() (string, string) {
