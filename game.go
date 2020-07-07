@@ -38,12 +38,17 @@ func main() {
 
 	for true {
 		markedSpots = append(userMarkedSpots, computerMarkedSpots...)
+		unMarkedSpots = diff(choices, markedSpots)
 
 		if gameOver(markedSpots) {
 			fmt.Println("Game Over, it's a tie")
 
 			break
 		}
+
+		fmt.Printf("Your turn(%s), pick a spot\n", userMarker)
+		userChoice = awaitUserChoice()
+
 	}
 }
 
@@ -53,6 +58,21 @@ func gameOver(markedSpots []uint) bool {
 	)
 
 	return len(markedSpots) == AVAILABLE_SPOTS
+}
+
+func awaitUserChoice() string {
+	var choice uint
+	for true {
+		fmt.Scanf("%d", &choice)
+		
+		if(Contains(unMarkedSpots, choice)) {
+			break
+		} 
+
+		fmt.Println("Invalid choice. Please pick an available spot.")
+	}
+
+	return choice
 }
 
 func assignMarkers() (string, string) {
