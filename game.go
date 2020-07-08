@@ -130,7 +130,7 @@ func awaitUserChoice(unMarkedSpots []uint) uint {
 }
 
 func awaitComputerChoice(unmarkedSpots []uint) uint {
-	time.Sleep(2000 * time.Millisecond) // sleep for 2 seconds
+	time.Sleep(1000 * time.Millisecond) // sleep for 2 seconds
 	rand.Seed(time.Now().Unix())
 	randomPosition := rand.Intn(len(unmarkedSpots))
 
@@ -247,4 +247,3 @@ func row(pos uint) uint {
 func column(pos uint) uint {
   return pos % 3
 }
-
