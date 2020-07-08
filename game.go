@@ -2,29 +2,29 @@ package main
 
 import (
 	"fmt"
-  "math/rand"
+	"math/rand"
 	"strings"
-  "time"
+	"time"
 )
 
 func main() {
-  // Information => Green
-  // Instruction => 
+	// Information => Green
+	// Instruction =>
 	// colorRed := "\033[31m"
 	// colorGreen := "\033[32m"
 
-	board := [][]string {
+	board := [][]string{
 		{"0", "1", "2"},
 		{"3", "4", "5"},
 		{"6", "7", "8"},
 	}
-	choices := []uint {0, 1, 2, 3, 4, 5, 6, 7, 8}
+	choices := []uint{0, 1, 2, 3, 4, 5, 6, 7, 8}
 
 	var (
-		userMarkedSpots []uint
+		userMarkedSpots     []uint
 		computerMarkedSpots []uint
-		markedSpots []uint
-		unMarkedSpots = []uint {0, 1, 2, 3, 4, 5, 6, 7, 8}
+		markedSpots         []uint
+		unMarkedSpots       = []uint{0, 1, 2, 3, 4, 5, 6, 7, 8}
 	)
 
 	userMarker, computerMarker := assignMarkers()
@@ -50,9 +50,9 @@ func main() {
 
 		userMarkedSpots = append(userMarkedSpots, userChoice)
 		if hasWon(userMarkedSpots) {
-			fmt.Printf ("User(%s) won!\n", userMarker)
+			fmt.Printf("User(%s) won!\n", userMarker)
 
-      break
+			break
 		}
 
 		// computer turn
@@ -60,9 +60,8 @@ func main() {
 		markedSpots = append(userMarkedSpots, computerMarkedSpots...)
 		unMarkedSpots = diff(choices, markedSpots)
 
-
 		fmt.Println("Computer is thinking...")
-    computerChoice := awaitComputerChoice(unMarkedSpots)
+		computerChoice := awaitComputerChoice(unMarkedSpots)
 
 		updateBoard(board, computerChoice, computerMarker)
 		drawBoard(board)
@@ -71,7 +70,7 @@ func main() {
 		if hasWon(computerMarkedSpots) {
 			fmt.Printf("Computer(%s) won!\n", computerMarker)
 
-      break
+			break
 		}
 
 		markedSpots = append(userMarkedSpots, computerMarkedSpots...)
@@ -84,7 +83,7 @@ func hasWon(markedSpots []uint) bool {
 	const (
 		SPOTS_REQUIRED_TO_WIN = 3
 	)
-	wins := [][]uint {
+	wins := [][]uint{
 		{0, 1, 2},
 		{3, 4, 5},
 		{6, 7, 8},
@@ -119,7 +118,7 @@ func awaitUserChoice(unMarkedSpots []uint) uint {
 	for true {
 		fmt.Scanf("%d", &choice)
 
-		if(Contains(unMarkedSpots, choice)) {
+		if Contains(unMarkedSpots, choice) {
 			break
 		}
 
@@ -138,13 +137,13 @@ func awaitComputerChoice(unmarkedSpots []uint) uint {
 }
 
 func assignMarkers() (string, string) {
-	marker := map[string]string {
+	marker := map[string]string{
 		"X": "O",
 		"O": "X",
 	}
 
 	var (
-		userMarker string
+		userMarker     string
 		computerMarker string
 	)
 
@@ -169,11 +168,11 @@ func assignMarkers() (string, string) {
 }
 
 func printInstructions() {
-  fmt.Println("\n")
+	fmt.Println("\n")
 	fmt.Println("*****************************")
 	fmt.Println("Initializing game board.....")
 	fmt.Println("*****************************")
-  fmt.Println("\n")
+	fmt.Println("\n")
 	fmt.Println("You can mark a location by entering any of the numbers shown on the board.")
 }
 
@@ -191,59 +190,58 @@ func drawBoard(board [][]string) {
 }
 
 func updateBoard(board [][]string, pos uint, marker string) {
-  r := row(pos)
-  c := column(pos)
+	r := row(pos)
+	c := column(pos)
 
-  board[r][c] = marker
+	board[r][c] = marker
 }
 
 func diff(superSet []uint, subset []uint) []uint {
-  var res []uint
+	var res []uint
 
-  for _, choice := range superSet {
-    if !Contains(subset, choice) {
-      res = append(res, choice)
-    }
-  }
+	for _, choice := range superSet {
+		if !Contains(subset, choice) {
+			res = append(res, choice)
+		}
+	}
 
-  return res
+	return res
 }
 
 func isSubset(subset []uint, superSet []uint) bool {
-  // TOOD: Use contains
+	// TOOD: Use contains
 
-  foundCount := 0
+	foundCount := 0
 
-  for _, s1 := range subset {
-    for _, s2 := range superSet {
-      if s1 == s2 {
-        foundCount += 1
+	for _, s1 := range subset {
+		for _, s2 := range superSet {
+			if s1 == s2 {
+				foundCount += 1
 
-        continue
-      }
-    }
-  }
+				continue
+			}
+		}
+	}
 
-  return foundCount >= len(subset)
+	return foundCount >= len(subset)
 }
 
-
 func Contains(set []uint, element uint) bool {
-  // TODO rename to memeber
+	// TODO rename to memeber
 
-  for _, n := range set {
-    if element == n {
-      return true
-    }
-  }
+	for _, n := range set {
+		if element == n {
+			return true
+		}
+	}
 
-  return false
+	return false
 }
 
 func row(pos uint) uint {
-  return pos / 3
+	return pos / 3
 }
 
 func column(pos uint) uint {
-  return pos % 3
+	return pos % 3
 }
