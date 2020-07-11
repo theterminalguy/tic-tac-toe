@@ -13,6 +13,7 @@ func main() {
 	// colorRed := "\033[31m"
 	// colorGreen := "\033[32m"
 
+	// this might be moved also to the board package
 	board := [][]string{
 		{"0", "1", "2"},
 		{"3", "4", "5"},
@@ -31,7 +32,7 @@ func main() {
 
 	printInstructions()
 
-	drawBoard(board)
+	board.draw(board)
 
 	// start game
 
@@ -45,8 +46,8 @@ func main() {
 		fmt.Printf("Your turn(%s), pick a spot\n", userMarker)
 		userChoice := awaitUserChoice(unMarkedSpots)
 
-		updateBoard(board, userChoice, userMarker)
-		drawBoard(board)
+		board.update(board, userChoice, userMarker)
+		board.draw(board)
 
 		userMarkedSpots = append(userMarkedSpots, userChoice)
 		if hasWon(userMarkedSpots) {
@@ -63,8 +64,8 @@ func main() {
 		fmt.Println("Computer is thinking...")
 		computerChoice := awaitComputerChoice(unMarkedSpots)
 
-		updateBoard(board, computerChoice, computerMarker)
-		drawBoard(board)
+		board.update(board, computerChoice, computerMarker)
+		board.draw(board)
 
 		computerMarkedSpots = append(computerMarkedSpots, computerChoice)
 		if hasWon(computerMarkedSpots) {
@@ -136,6 +137,7 @@ func awaitComputerChoice(unmarkedSpots []uint) uint {
 	return unmarkedSpots[randomPosition]
 }
 
+// TODO: Might have to refactor so marker is passed to input function
 func assignMarkers() (string, string) {
 	marker := map[string]string{
 		"X": "O",
@@ -147,6 +149,7 @@ func assignMarkers() (string, string) {
 		computerMarker string
 	)
 
+	// TODO: move this out
 	fmt.Println("Please choose a marker.", "X or O ?")
 	for true {
 		fmt.Scanf("%s", &userMarker)
@@ -176,26 +179,7 @@ func printInstructions() {
 	fmt.Println("You can mark a location by entering any of the numbers shown on the board.")
 }
 
-// should be in the board package
-func drawBoard(board [][]string) {
-	displayBoard := ""
-
-	for _, row := range board {
-		displayBoard += " "
-		displayBoard += strings.Join(row, " | ")
-		displayBoard += "\n-----------\n"
-	}
-
-	fmt.Println(displayBoard)
-}
-
-func updateBoard(board [][]string, pos uint, marker string) {
-	r := row(pos)
-	c := column(pos)
-
-	board[r][c] = marker
-}
-
+// move to set package
 func diff(superSet []uint, subset []uint) []uint {
 	var res []uint
 
@@ -208,6 +192,7 @@ func diff(superSet []uint, subset []uint) []uint {
 	return res
 }
 
+// move to set package
 func isSubset(subset []uint, superSet []uint) bool {
 	// TOOD: Use contains
 
@@ -226,6 +211,7 @@ func isSubset(subset []uint, superSet []uint) bool {
 	return foundCount >= len(subset)
 }
 
+// move to set package
 func Contains(set []uint, element uint) bool {
 	// TODO rename to memeber
 
@@ -236,12 +222,4 @@ func Contains(set []uint, element uint) bool {
 	}
 
 	return false
-}
-
-func row(pos uint) uint {
-	return pos / 3
-}
-
-func column(pos uint) uint {
-	return pos % 3
 }
