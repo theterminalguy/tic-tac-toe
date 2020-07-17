@@ -109,7 +109,7 @@ func awaitUserChoice(unMarkedSpots []uint) uint {
 	for true {
 		fmt.Scanf("%d", &choice)
 
-		if Contains(unMarkedSpots, choice) {
+		if contains(unMarkedSpots, choice) {
 			break
 		}
 
