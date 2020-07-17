@@ -8,33 +8,23 @@ import (
 )
 
 func main() {
-	// Information => Green
-	// Instruction =>
-	// colorRed := "\033[31m"
-	// colorGreen := "\033[32m"
-
-	// this might be moved also to the board package
 	board := [][]string{
 		{"0", "1", "2"},
 		{"3", "4", "5"},
 		{"6", "7", "8"},
 	}
 	choices := []uint{0, 1, 2, 3, 4, 5, 6, 7, 8}
+	unMarkedSpots := []uint{0, 1, 2, 3, 4, 5, 6, 7, 8}
 
-	var (
-		userMarkedSpots     []uint
-		computerMarkedSpots []uint
-		markedSpots         []uint
-		unMarkedSpots       = []uint{0, 1, 2, 3, 4, 5, 6, 7, 8}
-	)
+	userMarkedSpots := []uint{}
+	computerMarkedSpots := []uint{}
+	markedSpots := []uint{}
 
 	userMarker, computerMarker := assignMarkers()
 
 	printInstructions()
 
-	board.draw(board)
-
-	// start game
+	drawBoard(board)
 
 	for true {
 		if gameOver(markedSpots) {
@@ -46,8 +36,8 @@ func main() {
 		fmt.Printf("Your turn(%s), pick a spot\n", userMarker)
 		userChoice := awaitUserChoice(unMarkedSpots)
 
-		board.update(board, userChoice, userMarker)
-		board.draw(board)
+		updateBoard(board, userChoice, userMarker)
+		drawBoard(board)
 
 		userMarkedSpots = append(userMarkedSpots, userChoice)
 		if hasWon(userMarkedSpots) {
@@ -56,7 +46,7 @@ func main() {
 			break
 		}
 
-		// computer turn
+		// computer's turn
 
 		markedSpots = append(userMarkedSpots, computerMarkedSpots...)
 		unMarkedSpots = diff(choices, markedSpots)
@@ -64,8 +54,8 @@ func main() {
 		fmt.Println("Computer is thinking...")
 		computerChoice := awaitComputerChoice(unMarkedSpots)
 
-		board.update(board, computerChoice, computerMarker)
-		board.draw(board)
+		updateBoard(board, computerChoice, computerMarker)
+		drawBoard(board)
 
 		computerMarkedSpots = append(computerMarkedSpots, computerChoice)
 		if hasWon(computerMarkedSpots) {
@@ -130,14 +120,13 @@ func awaitUserChoice(unMarkedSpots []uint) uint {
 }
 
 func awaitComputerChoice(unmarkedSpots []uint) uint {
-	time.Sleep(1000 * time.Millisecond) // sleep for 2 seconds
+	time.Sleep(1000 * time.Millisecond)
 	rand.Seed(time.Now().Unix())
 	randomPosition := rand.Intn(len(unmarkedSpots))
 
 	return unmarkedSpots[randomPosition]
 }
 
-// TODO: Might have to refactor so marker is passed to input function
 func assignMarkers() (string, string) {
 	marker := map[string]string{
 		"X": "O",
@@ -149,7 +138,6 @@ func assignMarkers() (string, string) {
 		computerMarker string
 	)
 
-	// TODO: move this out
 	fmt.Println("Please choose a marker.", "X or O ?")
 	for true {
 		fmt.Scanf("%s", &userMarker)
@@ -164,14 +152,16 @@ func assignMarkers() (string, string) {
 		fmt.Println("Invalid marker. Please choose either X or O!")
 	}
 
+	fmt.Println("*****************************")
 	fmt.Printf("Your marker is: %s\n", userMarker)
-	fmt.Printf("The computer's marker is: %s\n", computerMarker)
+	fmt.Printf("The computer marker is: %s\n", computerMarker)
+	fmt.Println("*****************************")
+	fmt.Println("\n")
 
 	return userMarker, computerMarker
 }
 
 func printInstructions() {
-	fmt.Println("\n")
 	fmt.Println("*****************************")
 	fmt.Println("Initializing game board.....")
 	fmt.Println("*****************************")
@@ -179,42 +169,26 @@ func printInstructions() {
 	fmt.Println("You can mark a location by entering any of the numbers shown on the board.")
 }
 
-// move to set package
-func diff(superSet []uint, subset []uint) []uint {
-	var res []uint
+func drawBoard(board [][]string) {
+	displayBoard := ""
 
-	for _, choice := range superSet {
-		if !Contains(subset, choice) {
-			res = append(res, choice)
-		}
+	for _, row := range board {
+		displayBoard += " "
+		displayBoard += strings.Join(row, " | ")
+		displayBoard += "\n-----------\n"
 	}
 
-	return res
+	fmt.Println(displayBoard)
 }
 
-// move to set package
-func isSubset(subset []uint, superSet []uint) bool {
-	// TOOD: Use contains
+func updateBoard(board [][]string, pos uint, marker string) {
+	row := pos / 3
+	column := pos % 3
 
-	foundCount := 0
-
-	for _, s1 := range subset {
-		for _, s2 := range superSet {
-			if s1 == s2 {
-				foundCount += 1
-
-				continue
-			}
-		}
-	}
-
-	return foundCount >= len(subset)
+	board[row][column] = marker
 }
 
-// move to set package
-func Contains(set []uint, element uint) bool {
-	// TODO rename to memeber
-
+func contains(set []uint, element uint) bool {
 	for _, n := range set {
 		if element == n {
 			return true
@@ -222,4 +196,26 @@ func Contains(set []uint, element uint) bool {
 	}
 
 	return false
+}
+
+func diff(superSet []uint, subset []uint) []uint {
+	var res []uint
+
+	for _, choice := range superSet {
+		if !contains(subset, choice) {
+			res = append(res, choice)
+		}
+	}
+
+	return res
+}
+
+func isSubset(subset []uint, superSet []uint) bool {
+	for _, el := range subset {
+		if !contains(superSet, el) {
+			return false
+		}
+	}
+
+	return true
 }
